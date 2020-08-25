@@ -1,0 +1,23 @@
+***变量(variables)
+系统变量
+	1、全局变量（global）：
+	作用域：服务器每次启动时，将为所有的全局变量赋初始值，针对于所有的会话（连接）有效，但不能跨重启。
+	2、会话变量(session)
+自定义变量
+	用户变量
+	局部变量
+一、系统变量
+说明：由系统提供，非用户定义，属于服务器层面。
+注意：全局级别时，用global;会话级别时，用session,默认为session级别。
+使用方法：
+1、查看所有的系统变量
+show global|【session】 variables;
+2、查看满足条件的部分的系统变量
+show global|【session】 variables like '%%';
+3、查看指定的某个系统变量的值
+select @@global|【session】.系统变量；
+4、为指定系统变量指定值
+方式一、
+set global|【session】 系统变量=值；
+方式二、
+set @@global|【session】.系统变量=值；
