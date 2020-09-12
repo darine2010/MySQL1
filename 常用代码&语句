@@ -1,0 +1,98 @@
+一、if结构
+	示例一、
+		DELIMITER //
+		CREATE PROCEDURE pr17(IN a FLOAT)
+		BEGIN
+		IF a>=90 AND a<=100 THEN SELECT 'A';
+		ELSEIF a>=80 THEN SELECT 'B';
+		ELSEIF a>=60 THEN SELECT 'C';
+		ELSE SELECT 'D';
+		END IF;
+
+		END //
+		CALL pr17(93)//
+	示例二、
+		CREATE FUNCTION fu1(a INT,b VARCHAR(5)) RETURNS VARCHAR(3)
+		BEGIN
+		IF a>=90 AND a<=100 THEN SELECT 'A' INTO b;
+		ELSEIF a>=80 THEN SELECT 'B' INTO b;
+		ELSEIF a>=60 THEN SELECT 'C' INTO b;
+		ELSE SELECT 'D' INTO b;
+		END IF;
+		RETURN b;
+		END //
+		SELECT fu1(45,@b)//
+		SELECT @b//
+	示例三、
+		CREATE FUNCTION fu2(a INT) RETURNS VARCHAR(3)
+		BEGIN
+		IF a>=90 AND a<=100 THEN RETURN 'A';
+		ELSEIF a>=80 THEN RETURN 'B';
+		ELSEIF a>=60 THEN RETURN 'C';
+		ELSE RETURN 'D';
+		END IF;
+
+		END //
+
+		SELECT fu2(85)//
+二、while循环结构（while+do+end while）
+	1、无跳出条件
+		DELIMITER //
+		CREATE PROCEDURE pr18(IN insertcount INT)
+		BEGIN
+			DECLARE i INT DEFAULT 1;
+			WHILE i<=insertcount DO
+				INSERT INTO admin(`username`,`password`) VALUES(CONCAT('lily',i),'888888');
+				SET i=i+1;
+				END WHILE;
+		END //
+		CALL pr18(15)//
+2、有跳出条件(leave语句)
+	方案1、
+		DELIMITER //
+		CREATE PROCEDURE pr18(IN a INT,IN b INT)
+		BEGIN
+		DECLARE i INT DEFAULT 1;
+			a:WHILE i<=a DO 
+			INSERT INTO admin(`username`,`password`) VALUES (CONCAT('nancy',i),'0000');
+			IF i>=b THEN LEAVE a;#if 和end if 结构，与set i=i+1语句，顺序不同，结果不同；
+			END IF;
+		SET i=i+1;
+		END WHILE a;
+		END //
+		call pr18(100,20)//#进行20次后中止。
+		方案2、
+		DELIMITER //
+		CREATE PROCEDURE pr18(IN a INT,IN b INT)
+		BEGIN
+		DECLARE i INT DEFAULT 1;
+			a:WHILE i<=a DO 
+			INSERT INTO admin(`username`,`password`) VALUES (CONCAT('nancy',i),'0000');
+			SET i=i+1;
+			IF i>=b THEN LEAVE a;#if 和end if 结构，与set i=i+1语句，顺序不同，结果不同；
+			END IF;
+	
+		END WHILE a;
+		END //
+		call pr18(100,20)//#进行19次后中止。
+#####################
+3、指定次数，插入随机字符串。
+	CREATE PROCEDURE pr5 (IN insertcount INT)
+	BEGIN
+	DECLARE i INT DEFAULT 1;#定义一个变量，明确循环次数；默认值必须有，否则：系统不报错，但没有结果。
+	DECLARE str VARCHAR(26) DEFAULT "abcdefghijklmnopqrstuvwxyz";
+	DECLARE startindex INT DEFAULT 1;
+	DECLARE len INT DEFAULT 1;
+	WHILE i<=insertcount DO
+	SET startindex=FLOOR(RAND()*26+1);#设置起始值。
+	SET len=FLOOR(RAND()*(26-startindex+1)+1);#设定字符串长度。
+	INSERT INTO srtingtest(content) VALUES (SUBSTR(str,startindex,len));
+	SET i=i+1;#设定循环。
+	END WHILE;
+
+	END//
+
+	CALL pr5(10)//	
+###############
+4、清除表内所有记录，设置编号从1开始连续输入（初始化）
+	alter table 表名 auto_increment=1;
