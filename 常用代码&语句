@@ -93,6 +93,8 @@
 	END//
 
 	CALL pr5(10)//	
-###############
-4、清除表内所有记录，设置编号从1开始连续输入（初始化）
+4、###############清除表内所有记录，设置编号从1开始连续输入（初始化）
 	alter table 表名 auto_increment=1;
+5、##########选择某库某表全部字段名并用,隔开
+	SELECT GROUP_CONCAT(COLUMN_NAME SEPARATOR ",") FROM information_schema.COLUMNS 
+	WHERE TABLE_SCHEMA = 'db_name' AND TABLE_NAME = 'table_name'
