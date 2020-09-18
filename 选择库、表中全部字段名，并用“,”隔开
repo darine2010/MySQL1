@@ -1,0 +1,3 @@
+##########选择某库某表全部字段名并用,隔开
+SELECT GROUP_CONCAT(COLUMN_NAME SEPARATOR ",") FROM information_schema.COLUMNS 
+WHERE TABLE_SCHEMA = 'db_name' AND TABLE_NAME = 'table_name'
