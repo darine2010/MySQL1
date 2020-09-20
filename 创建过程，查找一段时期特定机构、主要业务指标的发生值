@@ -1,0 +1,36 @@
+################创建过程，查找一段时间特定机构、主要业务指标的发生值。（关键词：循环、多表连接）（注：月度类表、季度类表内容差异）
+DELIMITER //
+CREATE PROCEDURE Cur_indicators(IN dep VARCHAR(2),IN enddate DATE,IN Period_interval INT,IN Cycles INT)###指定起止日期间隔、循环次数
+BEGIN
+	DECLARE i INT DEFAULT 1;
+	DECLARE a INT DEFAULT 0;
+	DECLARE n INT DEFAULT 0;
+	DECLARE b VARCHAR(20);
+	DECLARE sd DATE DEFAULT NOW();
+	DECLARE ed DATE DEFAULT NOW();
+		SET a=Period_interval;
+		SET n=Cycles;
+		SET ed = DATE_FORMAT(enddate,'%Y%m%d');
+		SET sd =LAST_DAY(DATE_SUB(ed,INTERVAL a-1 MONTH));
+	WHILE i<=n
+	DO
+		SET b=CONCAT(YEAR(sd),MONTH(sd),"-",YEAR(ed),MONTH(ed));	
+		INSERT INTO 10Cur_indicators
+		SELECT b,d.`dep` 机构,SUM(`jc_amount`) 缴存额,SUM(`tq_amount`) 提取额,SUM(`loan_amount_out`) 发放额,SUM(`loan_amount_in`) 回收额,SUM(`account_on_com`) 单位开户,SUM(`account_on_per`) 个人开户,SUM(`loan_num_out`) 发放笔数,SUM(`tq_amount`)-SUM(`jc_amount`)-SUM(`loan_amount_in`)+SUM(`loan_amount_out_total`) 本期资金净流出额,SUM(`tq_amount_total`)/SUM(`jc_amount_totbal`) 提取率,IFNULL(SUM(`business_income`),0) 业务收入,IFNULL(SUM(`Business_expenses`),0) 业务支出,IFNULL(SUM(`Value_added_income`),0) 增值收益
+	FROM `01jcb` j
+	JOIN `03benefitsheet` bs
+	ON j.id=bs.id
+	JOIN dbinf d
+	ON bs.id=d.id
+		WHERE d.`Accounting_period` BETWEEN sd AND ed
+		AND d.dep=dep;
+			SET i=i+1;
+			SET ed =LAST_DAY(DATE_SUB(ed,INTERVAL a MONTH)); #取所属月最后一天，并执行循环。
+			SET sd =LAST_DAY(DATE_SUB(sd,INTERVAL a MONTH)); 
+	END WHILE;
+	END//
+	####清表、调用过程（提数）、并展示
+	DROP  PROCEDURE IF EXISTS Cur_indicators;
+	DELETE FROM 10Cur_indicators;
+	CALL Cur_indicators('hz','2020/6/30',6,5);
+	SELECT * FROM 10Cur_indicators;
