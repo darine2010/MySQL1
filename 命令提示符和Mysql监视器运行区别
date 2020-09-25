@@ -1,0 +1,19 @@
+通过命令提示符运行(不登陆)VSmysql监视器运行（登陆mysql）区别
+#一、“命令提示符”下（未登陆）（c:\users\yan ）
+	1、mysql 数据库名 -uroot -proot -e "mysql监视器命令"
+		mysql db1 -uroot -proot -e "select *　into outfile 'e:/data/out2.csv' fields terminated by ',' from tb1"
+	2、“重定向符>”实现：提取结果输出至文件中(结果不显示在屏幕上)
+		mysql -uroot -proot >log.txt
+	3、"重定向"输入及输出：输入SQL语句，并重定向将结果输出至文件
+		mysql -uroot -proot < c:\data\sql.txt > c:\data\log.txt
+	3、##汇总通过命令提示符执行的命令为文本文件，编写在.bat批处理文件中。
+		例 mysql db1 -uroot -proot -e "select *　into outfile 'e:/data/out2.csv' fields terminated by ',' from tb1"#(bat文件内容)
+#二、监视器上操作：登陆MySQL后，可执行以下操作（mysql>）
+	#1、数据导入from文件
+		load data infile '文件路径名称' into table 表名 character set GB2312 fields terminated by ',';
+	#2、导出数据
+		select * into outfile '文件路径名称'  fields terminated by ',' from 表名;
+	#3、从文件中读取并执行SQL命令（注：source非sql命令，行末不加分隔符）
+		source 文本文件名
+	#4、tee命令：执行结果双显（监视器和文件中）
+		tee log3.txt
