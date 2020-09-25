@@ -1,0 +1,6 @@
+数据库备份与恢复
+一、备份（命令提示符下）（mydump）	
+	mysqldump -uroot -proot db1>db1_bk.txt --default-character-set=utf8
+二、恢复（命令提示符下）(重定向<)
+	mysqladmin -uroot -proot create db2  #创建数据库
+	mysql -uroot -proot db2<db1_bk.txt --default-character-set=utf8 #恢复数据库
