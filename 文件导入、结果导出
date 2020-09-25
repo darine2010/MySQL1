@@ -1,4 +1,4 @@
-通过命令提示符运行(不登陆)VSmysql监视器运行（登陆mysql）区别
+文件导入、结果导出（命令提示符运行(不登陆)、mysql监视器运行（登陆mysql））区别
 #一、“命令提示符”下（未登陆）（c:\users\yan ）
 	1、mysql 数据库名 -uroot -proot -e "mysql监视器命令"
 		mysql db1 -uroot -proot -e "select *　into outfile 'e:/data/out2.csv' fields terminated by ',' from tb1"
