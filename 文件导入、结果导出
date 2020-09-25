@@ -9,11 +9,11 @@
 	3、##汇总通过命令提示符执行的命令为文本文件，编写在.bat批处理文件中。
 		例 mysql db1 -uroot -proot -e "select *　into outfile 'e:/data/out2.csv' fields terminated by ',' from tb1"#(bat文件内容)
 #二、监视器上操作：登陆MySQL后，可执行以下操作（mysql>）
-	#1、数据导入from文件
+	#1、导入数据
 		load data infile '文件路径名称' into table 表名 character set GB2312 fields terminated by ',';
 	#2、导出数据
 		select * into outfile '文件路径名称'  fields terminated by ',' from 表名;
-	#3、从文件中读取并执行SQL命令（注：source非sql命令，行末不加分隔符）
+	#3、批量执行SQL语句（source非sql命令，行末不加分隔符）
 		source 文本文件名
 	#4、tee命令：执行结果双显（监视器和文件中）
 		tee log3.txt
