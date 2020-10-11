@@ -98,3 +98,67 @@
 5、##########选择某库某表全部字段名并用,隔开
 	SELECT GROUP_CONCAT(COLUMN_NAME SEPARATOR ",") FROM information_schema.COLUMNS 
 	WHERE TABLE_SCHEMA = 'db_name' AND TABLE_NAME = 'table_name'
+#6、查找某期、某机构主要业务指标。（关键词：循环、多表连接）（注：月度类表、季度类表内容差异）
+	#6.1
+	DROP PROCEDURE IF EXISTS Cur_indicators;
+	DELIMITER //
+	CREATE PROCEDURE Cur_indicators(IN dep VARCHAR(2),IN enddate DATE,IN Period_interval INT,IN Cycles INT)###指定起止日期间隔、循环次数
+	BEGIN
+		DECLARE i INT DEFAULT 1;
+		DECLARE a INT DEFAULT 0;
+		DECLARE n INT DEFAULT 0;
+		DECLARE b VARCHAR(20);
+		DECLARE dn VARCHAR(100) DEFAULT 'e';
+		DECLARE sd DATE DEFAULT NOW();
+		DECLARE ed DATE DEFAULT NOW();
+			SET a=Period_interval;#每组数据所属中日期之间的间隔
+			SET n=Cycles;#需要几组数据
+			SET ed = DATE_FORMAT(enddate,'%Y%m%d');
+			SET sd =LAST_DAY(DATE_SUB(ed,INTERVAL a-1 MONTH));
+			SET dn=CONCAT(dep,'-',ed,'-',a,'-',n);
+		DELETE FROM 10cur_indicators;#执行循环前，先清空表格
+		WHILE i<=n
+		DO
+		SET b=CONCAT(YEAR(sd),IF(MONTH(sd)<10,CONCAT('0',MONTH(sd)),MONTH(sd)),"-",YEAR(ed),IF(MONTH(ed)<10,CONCAT('0',MONTH(ed)),MONTH(ed)));	
+		INSERT INTO `10cur_indicators`		
+			SELECT b,d.`dep` 机构,SUM(`jc_amount`) 缴存额,SUM(`tq_amount`) 提取额,SUM(`loan_amount_out`) 发放额,SUM(`loan_amount_in`) 回收额,SUM(`account_on_com`) 单位开户,SUM(`account_on_per`) 个人开户,SUM(`loan_num_out`) 发放笔数,SUM(`tq_amount`)-SUM(`jc_amount`)-SUM(`loan_amount_in`)+SUM(`loan_amount_out_total`) 本期资金净流出额,SUM(`tq_amount_total`)/SUM(`jc_amount_totbal`) 提取率,IFNULL(SUM(`business_income`),0) 业务收入,IFNULL(SUM(`Business_expenses`),0) 业务支出,IFNULL(SUM(`Value_added_income`),0) 增值收益
+			FROM `01jcb` j
+		LEFT JOIN `03benefitsheet` bs
+		ON j.id=bs.id
+		JOIN `db_mainindexs` d
+		ON j.id=d.id
+			WHERE d.`Accounting_period` BETWEEN sd AND ed
+			AND d.dep=dep;
+				SET i=i+1;
+				SET ed =LAST_DAY(DATE_SUB(ed,INTERVAL a MONTH)); #取所属月最后一天，并执行循环。
+				SET sd =LAST_DAY(DATE_SUB(sd,INTERVAL a MONTH)); 
+		END WHILE;
+		SELECT * FROM 10cur_indicators;
+	END//
+
+	#6.2 ####调用过程（提取当期数据并展示
+		CALL Cur_indicators('qx','2020-9-30',3,12); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
