@@ -138,7 +138,8 @@
 
 	#6.2 ####调用过程（提取当期数据并展示
 		CALL Cur_indicators('qx','2020-9-30',3,12); 
-
+#7设置字段值，为自动获取当前时间。
+	'字段名' TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
 
 
 
